@@ -5,6 +5,8 @@ gnu tools rewritten
 
 There is not that many tools rewritten, commands like `rm, yes, mkdir, etc` will be added later
 
+This is the beta version, some stuff might be broken
+
 ## Building
 Run `make` to compile all the binaries
 
