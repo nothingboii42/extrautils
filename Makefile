@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize 
 
 BINS = \
 	clear \
