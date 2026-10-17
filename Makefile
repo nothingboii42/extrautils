@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize 
+CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize
 
 BINS = \
 	clear \
@@ -9,7 +9,9 @@ BINS = \
 	whoami \
 	echo \
 	home \
-	uname
+	uname \
+	arch \
+	date
 
 all: extrautils
 extrautils:
@@ -21,6 +23,10 @@ extrautils:
 	$(CC) $(CFLAGS) -c echo.c -o echo.o
 	$(CC) $(CFLAGS) -c home.c -o home.o
 	$(CC) $(CFLAGS) -c uname.c -o uname.o
+	$(CC) $(CFLAGS) -c arch.c -o arch.o
+	$(CC) $(CFLAGS) -c date.c -o date.o
+	$(CC) $(CFLAGS) date.o -o date
+	$(CC) $(CFLAGS) arch.o -o arch
 	$(CC) $(CFLAGS) clear.o -o clear
 	$(CC) $(CFLAGS) pwd.o -o pwd
 	$(CC) $(CFLAGS) sleep.o -o sleep
