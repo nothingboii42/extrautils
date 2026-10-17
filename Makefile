@@ -1,6 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize
 
+DESTDIR = /
+
 BINS = \
 	clear \
 	pwd \
