@@ -7,6 +7,7 @@ int main(int argc, char *argv[]) {
 	puts("A simple program that executes Extrautils binaries");
 	puts("Commands:");
 	puts("		{clear}, {echo}, {home}, {pwd}, {sleep}, {uname}, {whoami}");
+	puts("		{date}, {arch}");
 	return 1;
     }
 
