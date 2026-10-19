@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize
+CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize -Wconversion -Wdouble-promotion -Wshadow -Wformat=2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fsanitize=address -fsanitize=address
 
 DESTDIR = /
 
@@ -16,7 +16,8 @@ BINS = \
 	date \
 	halt \
 	reboot \
-	poweroff
+	poweroff \
+	env
 
 all: extrautils
 extrautils:
@@ -33,6 +34,7 @@ extrautils:
 	$(CC) $(CFLAGS) -c src/halt.c -o halt.o
 	$(CC) $(CFLAGS) -c src/poweroff.c -o poweroff.o
 	$(CC) $(CFLAGS) -c src/reboot.c -o reboot.o
+	$(CC) $(CFLAGS) -c src/env.c -o env.o
 	$(CC) $(CFLAGS) poweroff.o -o poweroff
 	$(CC) $(CFLAGS) reboot.o -o reboot
 	$(CC) $(CFLAGS) halt.o -o halt
@@ -47,6 +49,7 @@ extrautils:
 	$(CC) $(CFLAGS) home.o -o home
 	$(CC) $(CFLAGS) uname.o -o uname
 	gzip -vk man/*.1
+	$(CC) $(CFLAGS) env.o -o env
 
 .PHONY: clean install
 clean:
