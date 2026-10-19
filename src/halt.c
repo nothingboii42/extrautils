@@ -2,7 +2,6 @@
 
 #include <unistd.h>
 #include <sys/reboot.h>
-#include <string.h>
 #include <stdio.h>
 
 #define SYSTEM_HALT_CMD RB_HALT
