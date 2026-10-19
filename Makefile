@@ -14,7 +14,9 @@ BINS = \
 	uname \
 	arch \
 	date \
-	halt
+	halt \
+	reboot \
+	poweroff
 
 all: extrautils
 extrautils:
@@ -29,6 +31,10 @@ extrautils:
 	$(CC) $(CFLAGS) -c src/arch.c -o arch.o
 	$(CC) $(CFLAGS) -c src/date.c -o date.o
 	$(CC) $(CFLAGS) -c src/halt.c -o halt.o
+	$(CC) $(CFLAGS) -c src/poweroff.c -o poweroff.o
+	$(CC) $(CFLAGS) -c src/reboot.c -o reboot.o
+	$(CC) $(CFLAGS) poweroff.o -o poweroff
+	$(CC) $(CFLAGS) reboot.o -o reboot
 	$(CC) $(CFLAGS) halt.o -o halt
 	$(CC) $(CFLAGS) date.o -o date
 	$(CC) $(CFLAGS) arch.o -o arch
