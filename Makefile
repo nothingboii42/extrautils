@@ -17,10 +17,12 @@ BINS = \
 	halt \
 	reboot \
 	poweroff \
-	env
+	env \
+	touch
 
 all: extrautils
 extrautils:
+	$(CC) $(CFLAGS) -c src/touch.c -o touch.o
 	$(CC) $(CFLAGS) -c src/clear.c -o clear.o
 	$(CC) $(CFLAGS) -c src/pwd.c -o pwd.o
 	$(CC) $(CFLAGS) -c src/extrautils.c -o extrautils.o
@@ -50,6 +52,7 @@ extrautils:
 	$(CC) $(CFLAGS) uname.o -o uname
 	gzip -vk man/*.1
 	$(CC) $(CFLAGS) env.o -o env
+	$(CC) $(CFLAGS) touch.o -o touch
 
 .PHONY: clean install
 clean:
