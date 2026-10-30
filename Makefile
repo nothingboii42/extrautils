@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize -Wconversion -Wdouble-promotion -Wshadow -Wformat=2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fsanitize=address -fsanitize=address
+CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize -Wconversion -Wdouble-promotion -Wshadow -Wformat=2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fsanitize=address
 
 DESTDIR = /
 
