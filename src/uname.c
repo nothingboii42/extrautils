@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 	    case '?':
 		printf("use -h or --help for help\n");
 		return 1;
-	    defualt:
+	    default:
 		return 1;
 	}
     }
