@@ -7,6 +7,7 @@ int main(int argc, char *argv[]) {
     int command_arg;
     int options = 0;
 
+    // idk why it failed, dont ask me
     if (uname(&b) != 0) {
 	fprintf(stderr, "uname system call failed\n");
 	return 1;
@@ -16,6 +17,7 @@ int main(int argc, char *argv[]) {
         printf("%s\n", b.sysname);
     }
 
+    // all args for this program
     struct option long_cmd[] = {
         {"all", no_argument,       NULL, 'a'},
 	{"node", no_argument,	   NULL, 'n'},
@@ -26,6 +28,7 @@ int main(int argc, char *argv[]) {
 	{0,         0,                 0,  0 }
     };
 
+    // thanks getopt_long
     while ((command_arg = getopt_long(argc, argv, "anrvmh", long_cmd, &options)) != -1) {
 	switch (command_arg) {
 	    case 'a':

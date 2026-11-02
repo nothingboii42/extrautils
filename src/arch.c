@@ -1,3 +1,4 @@
+// pretty basic
 #include <sys/utsname.h>
 #include <stdio.h>
 

@@ -1,0 +1,22 @@
+#!/bin/sh
+# rcS - script that is executed by Extrautils Init system
+
+# set variables
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin
+export USER=$(whoami)
+
+# mount / as read write
+mount -o remount,rw /
+
+# make mount points
+mkdir -p /dev/pts
+mkdir -p /dev/shm
+
+# mount from /etc/fstab
+mount -a
+
+# start up network
+ifconfig lo 127.0.0.1 up
+
+# start a shell
+exec /bin/sh -i -l

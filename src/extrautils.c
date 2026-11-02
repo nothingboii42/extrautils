@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
 	puts("Commands:");
 	puts("		{clear}, {echo}, {home}, {pwd}, {sleep}, {uname}, {whoami}");
 	puts("		{date}, {arch}, {halt}, {reboot}, {poweroff}, {env}, {touch}");
+	puts("		{sh}, {init}");
 	return 1;
     }
 
