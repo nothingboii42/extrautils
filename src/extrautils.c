@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[]) {
     if (argc == 1) {
-        puts("Extrautils Project v0.0.1");
+        puts("Extrautils Project v0.0.7"); // how did i not know it was still on 0.0.1 ????
 	puts("A simple program that executes Extrautils binaries");
 	puts("Commands:");
 	puts("		{clear}, {echo}, {home}, {pwd}, {sleep}, {uname}, {whoami}");
