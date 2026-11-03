@@ -93,6 +93,3 @@ install:
 	@cd $(DESTDIR) && ln -sv usr/bin bin
 	@cd $(DESTDIR) && ln -sv usr/sbin sbin
 	@chmod -v +x $(DESTDIR)/etc/init.d/*
-	@ln $(DESTDIR)/sbin/reboot $(DESTDIR)/sbin/init
-	@ln $(DESTDIR)/sbin/halt $(DESTDIR)/sbin/init
-	@ln $(DESTDIR)/sbin/poweroff $(DESTDIR)/sbin/init
