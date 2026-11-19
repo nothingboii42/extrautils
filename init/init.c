@@ -99,6 +99,11 @@ int main(int argc, char *argv[]) {
 
     // looks like we are parent id 0 and pid 1
 
+    if (geteuid()) {
+	perror("init");
+	return 1;
+    }
+
     mkdir("/proc", 0755);
     mkdir("/sys", 0755);
     mkdir("/dev", 0755);

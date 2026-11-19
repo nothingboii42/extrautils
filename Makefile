@@ -1,6 +1,3 @@
-# My first and last saturween as a kid! thats what other people are calling it...
-# Happy halloween, dont eat to much candy (might be a different day rn)
-
 CC = gcc
 CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize -Wconversion -Wdouble-promotion -Wshadow -Wformat=2 -fstack-protector-strong -D_FORTIFY_SOURCE=2 -fstack-clash-protection -fsanitize=address
 
@@ -19,7 +16,6 @@ SHOBJ = \
 BINS = \
 	clear \
 	pwd \
-	extrautils \
 	sleep \
 	whoami \
 	echo \
@@ -31,13 +27,12 @@ BINS = \
 	touch \
 	sh
 
-all: extrautils
-extrautils:
+all: $(BINS)
+$(BINS):
 	mkdir -pv obj
 	$(CC) $(CFLAGS) -c src/touch.c -o touch.o
 	$(CC) $(CFLAGS) -c src/clear.c -o clear.o
 	$(CC) $(CFLAGS) -c src/pwd.c -o pwd.o
-	$(CC) $(CFLAGS) -c src/extrautils.c -o extrautils.o
 	$(CC) $(CFLAGS) -c src/sleep.c -o sleep.o
 	$(CC) $(CFLAGS) -c src/whoami.c -o whoami.o
 	$(CC) $(CFLAGS) -c src/echo.c -o echo.o
@@ -59,11 +54,10 @@ extrautils:
 	$(CC) $(CFLAGS) obj/pwd.o -o pwd
 	$(CC) $(CFLAGS) obj/sleep.o -o sleep
 	$(CC) $(CFLAGS) obj/whoami.o -o whoami
-	$(CC) $(CFLAGS) obj/extrautils.o -o extrautils
 	$(CC) $(CFLAGS) obj/echo.o -o echo
 	$(CC) $(CFLAGS) obj/home.o -o home
 	$(CC) $(CFLAGS) obj/uname.o -o uname
-	gzip -vk man/*.1
+	gzip -vkf man/*.1
 	$(CC) $(CFLAGS) obj/env.o -o env
 	$(CC) $(CFLAGS) obj/touch.o -o touch
 	$(CC) $(CFLAGS) -c init/init.c -o init.o

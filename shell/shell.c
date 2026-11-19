@@ -25,8 +25,24 @@ void block_int(void) {
     sigaction(SIGTSTP, &sa, NULL);
 }
 
+int exec_cmd(const char *line[]) {
+    pid_t pid = fork();
+    if (pid < 0) {
+        fprintf(stderr, "%s: failed to fork\n", name);
+        exit(1);
+    } else if (pid == 0) {
+        execvp(line[0], line);
+        // if execvp returns, the command was not found
+        printf("%s: command not found: %s\n", name, line[0]);
+        exit(127);
+    } else {
+        // parent process waits for command
+        wait(NULL);
+    }
+}
+
 // interactive, but we dont know if its a login or non-login shell
-void spawn_shell(char type[]) {
+void spawn_shell(const char type[]) {
     /* D is for Default
        V is for verbose
        T is for trace mode */
@@ -84,6 +100,10 @@ void spawn_shell(char type[]) {
 			        fprintf(stderr, "%s: failed to chdir to home directory\n", name);
 			    }
 			}
+		    } else if (strcmp(tokens[1], "~") == 0) {
+			if (chdir(home) == -1) {
+                            fprintf(stderr, "%s: failed to chdir to home directory\n", name);
+                        }
 		    } else { // tokens[1] exists
 		        if (chdir(tokens[1]) == -1) {
 			    perror("cd");
@@ -93,6 +113,8 @@ void spawn_shell(char type[]) {
 		    ; // do nothing because its a comment
 		} else if (strcmp(tokens[0], ":") == 0) {
 		    ; // do nothing again because its a placeholder
+		} else if (strcmp(tokens[0], "exec") == 0) {
+		    execvp(tokens[1], tokens);
                 } else {
 		    // we are now gonna fork
 		    pid_t pid = fork();
@@ -115,12 +137,31 @@ void spawn_shell(char type[]) {
 	    size = 0;
 	}
     } else if (strcmp(type, "V") == 0) {
-	if (geteuid()) {
-	    printf("$ ");
-	    fflush(stdout);
-	} else {
-	    printf("# ");
-	    fflush(stdout);
+	while (1) {
+	    if (geteuid()) {
+	        printf("$ ");
+	        fflush(stdout);
+	    } else {
+	        printf("# ");
+	        fflush(stdout);
+	    }
+
+	    if (getline(&command, &size, stdin) == -1) {
+                printf("\n"); // try to make it look natural
+                printf("exit\n");
+                free(command);
+                break;
+            }
+
+	    int i = 0;
+            memset(tokens, 0, sizeof(tokens));
+
+            char *token = strtok(command, " \t\r\n");
+            while (token != NULL) {
+                tokens[i++] = token;
+                if (i >= 501) break;
+                token = strtok(NULL, " \t\r\n");
+            }
 	}
     }
 }
