@@ -7,34 +7,41 @@
 #include <sys/mount.h>
 #include <string.h>
 #include <sys/reboot.h>
-
-#define SYSTEM_HALT_CMD RB_HALT
+#include <sys/stat.h>
+#include <sys/wait.h>
 
 int poweroff(void) {
-#if defined(__linux__)
     if (reboot(RB_POWER_OFF) == -1) {
         return 1;
     }
-#else
-    if (reboot(RB_HALT | RB_POWERDOWN) == -1) {
-        return 1;
-    }
-#endif
 }
 
 int halt(void) {
-    // check for os, because bsd and linux are different
-#if defined(__linux__)
-    #undef SYSTEM_HALT_CMD
-    #define SYSTEM_HALT_CMD RB_HALT_SYSTEM
-#elif defined(RB_POWERDOWN)
-    #undef SYSTEM_HALT_CMD
-    #define SYSTEM_HALT_CMD (RB_HALT | RB_POWERFOWN)
-#endif
-
     // execute reboot system call
-    if (reboot(SYSTEM_HALT_CMD) == -1) {
+    if (reboot(RB_HALT_SYSTEM) == -1) {
         return 1;
+    }
+}
+
+int restart(void) {
+    if (reboot(RB_AUTOBOOT) == -1) {
+        return 1; // it failed
+    }
+}
+
+int spawn_shell(const char *tty) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        setsid();
+        int fd = open(tty, O_RDWR);
+        if (fd >= 0) {
+            ioctl(fd, TIOCSCTTY, 1);
+            dup2(fd, 0); dup2(fd, 1); dup2(fd, 2);
+            if (fd > 2) close(fd);
+        }
+        char *shell[] = { "/bin/sh", "--login", "-i", NULL };
+        execv(shell[0], shell);
+        _exit(1);
     }
 }
 
@@ -50,35 +57,45 @@ void show_usage(void) {
 }
 
 int main(int argc, char *argv[]) {
-    // options like reboot, poweroff, halt, --help
-    if (argc > 1 && strcmp(argv[1], "reboot") == 0) {
-	if (geteuid()) {
-	    fprintf(stderr, "%s: Permission Denied\n", argv[0]);
-	    return 1;
-	}
+    if (geteuid()) {
+        fprintf(stderr, "%s: must be running as root!\n", argv[0]);
+        return 1;
+    }
 
-	sync();
-	if (reboot(RB_AUTOBOOT) == -1) {
+    // check what is the inits name
+    const char *name = strrchr(argv[0], '/');
+    name = (name != NULL) ? name + 1 : argv[0];
+
+    // what is the files name
+    if (strcmp(name, "reboot") == 0) {
+        sync();
+        if (reboot(RB_AUTOBOOT) == -1) {
             return 1; // it failed
         }
+    } else if (strcmp(name, "poweroff") == 0) {
+        sync();
+        if (reboot(RB_POWER_OFF) == -1) {
+            return 1;
+        }
+    } else if (strcmp(name, "halt") == 0) {
+        if (reboot(RB_HALT_SYSTEM) == -1) {
+            return 1;
+        }
+    }
+
+    // options like reboot, poweroff, halt, --help
+    if (argc > 1 && strcmp(argv[1], "reboot") == 0) {
+	sync();
+	int poop = restart();
+	return poop;
     } else if (argc > 1 && strcmp(argv[1], "poweroff") == 0) {
-	if (geteuid()) {
-            fprintf(stderr, "%s: Permission Denied\n", argv[0]);
-            return 1;
-        }
-
 	sync();
-	poweroff();
-	return poweroff; // hope it didnt fail
+	int fucked = poweroff();
+	return fucked; // hope it didnt fail
     } else if (argc > 1 && strcmp(argv[1], "halt") == 0) {
-	if (geteuid()) {
-            fprintf(stderr, "%s: Permission Denied\n", argv[0]);
-            return 1;
-        }
-
 	sync();
-	halt();
-	return halt; // hope this also didnt fail
+	int shit = halt();
+	return shit; // hope this also didnt fail
     } else if (argc > 1 && strcmp(argv[1], "--help") == 0) {
 	printf("usage: %s [options]\n", argv[0]);
 	show_usage();
@@ -98,11 +115,6 @@ int main(int argc, char *argv[]) {
     }
 
     // looks like we are parent id 0 and pid 1
-
-    if (geteuid()) {
-	perror("init");
-	return 1;
-    }
 
     mkdir("/proc", 0755);
     mkdir("/sys", 0755);
@@ -128,22 +140,23 @@ int main(int argc, char *argv[]) {
     // script at /etc/init.d
     char *script[] = {"/etc/init.d/rcS", NULL};
 
-    while (1) {
-	pid_t pid = fork();
-	if (pid < 0) {
-	    perror("init");
-	    fprintf(stderr, "ERROR: Fork failed\n");
-	    sleep(2);
-	    continue;
-	}
-
-	if (pid == 0) {
-	    execvp(script[0], script); // execute script
-	    perror("init");
-	    fprintf(stderr, "ERROR: Failed to execute /etc/init.d/rcS!\n");
-	} else {
-	    int s;
-	    waitpid(pid, &s, 0);
-	}
+    pid_t rcs = fork();
+    if (rcs == 0) {
+        execv(script[0], script);
+        _exit(1);
     }
+    waitpid(rcs, NULL, 0);
+
+    // use the function to spawn a shell on console
+    pid_t sp = spawn_shell("/dev/console");
+    while (1) {
+        int status;
+        pid_t dead = waitpid(-1, &status, 0);
+
+        if (dead == sp) {
+            sp = spawn_shell("/dev/console"); // respawn shell
+        }
+    }
+
+    return 0;
 }

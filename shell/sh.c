@@ -31,6 +31,11 @@ int main(int argc, char *argv[]) {
 
     // parse some args, but not all, or else it will be eugh
     if (argc > 1 && strcmp(argv[1], "-c") == 0) {
+        if (argv[2] == NULL) {
+	    printf("no command was detected (work in progress)\n");
+	    return 1;
+	}
+
 	pid_t pid = fork();
 	if (pid < 0) {
             fprintf(stderr, "%s: failed to fork\n", name);

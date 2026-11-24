@@ -1,6 +1,12 @@
 #!/bin/sh
 # rcS - script that is executed by Extrautils Init system
 
+# set path and file permissions
+export PATH="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+umask 022
+
+trap "" INT QUIT TSTP
+
 # mount / as read write
 mount -o remount,rw /
 
@@ -8,11 +14,11 @@ mount -o remount,rw /
 mkdir -p /dev/pts
 mkdir -p /dev/shm
 
+# mount some stuff
+mount -t devpts devpts /dev/pts
+
 # mount from /etc/fstab
 mount -a
 
 # start up network
-ifconfig lo 127.0.0.1 up
-
-# start a shell
-exec /bin/sh --login -i
+ip link set lo up 2>/dev/null || ifconfig lo 127.0.0.1

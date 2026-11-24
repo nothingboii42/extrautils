@@ -4,10 +4,7 @@ CFLAGS = -Wall -Wextra -g -O2 -march=native -mtune=native -ftree-vectorize -Wcon
 DESTDIR = /
 
 INIT = \
-	init/init \
-	reboot \
-	poweroff \
-	halt
+	init/init
 
 SHOBJ = \
 	obj/sh.o \
@@ -40,14 +37,8 @@ $(BINS):
 	$(CC) $(CFLAGS) -c src/uname.c -o uname.o
 	$(CC) $(CFLAGS) -c src/arch.c -o arch.o
 	$(CC) $(CFLAGS) -c src/date.c -o date.o
-	$(CC) $(CFLAGS) -c init/halt.c -o halt.o
-	$(CC) $(CFLAGS) -c init/poweroff.c -o poweroff.o
-	$(CC) $(CFLAGS) -c init/reboot.c -o reboot.o
 	$(CC) $(CFLAGS) -c src/env.c -o env.o
 	mv -fv *.o obj/
-	$(CC) $(CFLAGS) obj/poweroff.o -o poweroff
-	$(CC) $(CFLAGS) obj/reboot.o -o reboot
-	$(CC) $(CFLAGS) obj/halt.o -o halt
 	$(CC) $(CFLAGS) obj/date.o -o date
 	$(CC) $(CFLAGS) obj/arch.o -o arch
 	$(CC) $(CFLAGS) obj/clear.o -o clear
@@ -71,19 +62,20 @@ $(BINS):
 clean:
 	@rm -rfv obj/
 	@rm -fv *.o
-	@rm -fv $(BINS)
-	@rm -fv $(INIT)
+	@rm -fv $(BINS) $(INIT)
 	@rm -fv man/*.gz
 
 install:
-	@mkdir -pv $(DESTDIR)/usr/bin
-	@mkdir -pv $(DESTDIR)/usr/share/man/man1
-	@mkdir -pv $(DESTDIR)/usr/sbin
-	@cp -fv $(BINS) $(DESTDIR)/usr/bin
-	@cp -fv $(INIT) $(DESTDIR)/usr/sbin
-	@cp -fv man/*.gz $(DESTDIR)/usr/share/man/man1
-	@mkdir -pv $(DESTDIR)/etc/init.d
-	@cp -fv init/rcS $(DESTDIR)/etc/init.d
-	@cd $(DESTDIR) && ln -sv usr/bin bin
-	@cd $(DESTDIR) && ln -sv usr/sbin sbin
-	@chmod -v +x $(DESTDIR)/etc/init.d/*
+	mkdir -p $(DESTDIR)/usr/bin
+	mkdir -p $(DESTDIR)/usr/share/man/man1
+	mkdir -p $(DESTDIR)/usr/sbin
+	install -p -m 755 $(BINS) $(DESTDIR)/usr/bin
+	install -p -m 755 $(INIT) $(DESTDIR)/usr/sbin
+	install -p -m 755 man/*.gz $(DESTDIR)/usr/share/man/man1
+	mkdir -pv $(DESTDIR)/etc/init.d
+	install -p -m 755 init/rcS $(DESTDIR)/etc/init.d
+	cd $(DESTDIR) && ln -sf usr/bin bin
+	cd $(DESTDIR) && ln -sf usr/sbin sbin
+	ln -sf $(DESTDIR)/sbin/init $(DESTDIR)/sbin/reboot
+	ln -sf $(DESTDIR)/sbin/init $(DESTDIR)/sbin/poweroff
+	ln -sf $(DESTDIR)/sbin/init $(DESTDIR)/sbin/halt
